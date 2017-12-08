@@ -105,6 +105,13 @@
 
 @end
 
+// expose private configuration value required for background operation
+@interface WKWebViewConfiguration ()
+
+@property (setter=_setAlwaysRunsAtForegroundPriority:, nonatomic) bool _alwaysRunsAtForegroundPriority;
+
+@end
+
 // see forwardingTargetForSelector: selector comment for the reason for this pragma
 #pragma clang diagnostic ignored "-Wprotocol"
 
@@ -125,7 +132,7 @@
         self.frame = frame;
         [GCDWebServer setLogLevel: kGCDWebServerLoggingLevel_Warning];
         self.webServer = [[GCDWebServer alloc] init];
-        [self.webServer addGETHandlerForBasePath:@"/" directoryPath:@"/" indexFilename:nil cacheAge:3600 allowRangeRequests:YES];
+        [self.webServer addGETHandlerForBasePath:@"/" directoryPath:@"/" indexFilename:nil cacheAge:0 allowRangeRequests:YES];
         NSDictionary *options = @{
                                   GCDWebServerOption_Port: @(8080),
                                   GCDWebServerOption_BindToLocalhost: @(YES),
@@ -154,6 +161,8 @@
     if (settings == nil) {
         return configuration;
     }
+    //required to stop wkwebview suspending in background too eagerly (as used in background mode plugin)
+    configuration._alwaysRunsAtForegroundPriority = [settings cordovaBoolSettingForKey:@"WKEnableBackground" defaultValue:YES];
     configuration.allowsInlineMediaPlayback = [settings cordovaBoolSettingForKey:@"AllowInlineMediaPlayback" defaultValue:YES];
     configuration.suppressesIncrementalRendering = [settings cordovaBoolSettingForKey:@"SuppressesIncrementalRendering" defaultValue:NO];
     configuration.allowsAirPlayForMediaPlayback = [settings cordovaBoolSettingForKey:@"MediaPlaybackAllowsAirPlay" defaultValue:YES];
