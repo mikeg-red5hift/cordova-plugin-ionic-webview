@@ -124,7 +124,18 @@ var iOSExec = function () {
 iOSExec.nativeCallback = function (callbackId, status, message, keepCallback, debug) {
     var success = status === 0 || status === 1;
     var args = convertMessageToArgsNativeToJs(message);
-    cordova.callbackFromNative(callbackId, success, status, args, keepCallback); // eslint-disable-line
+//    cordova.callbackFromNative(callbackId, success, status, args, keepCallback); // eslint-disable-line
+
+    if (window.appSuspended)
+    {
+        cordova.callbackFromNative(callbackId, success, status, args, keepCallback); // eslint-disable-line
+    }
+    else
+    {
+        setTimeout(function () {
+            cordova.callbackFromNative(callbackId, success, status, args, keepCallback); // eslint-disable-line
+        }, 0);
+    }    
 };
 
 // for backwards compatibility
