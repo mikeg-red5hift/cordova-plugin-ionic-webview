@@ -132,9 +132,9 @@ iOSExec.nativeCallback = function (callbackId, status, message, keepCallback, de
     }
     else
     {
-        setTimeout(function () {
+        Promise.resolve().then(function () {
             cordova.callbackFromNative(callbackId, success, status, args, keepCallback); // eslint-disable-line
-        }, 0);
+        });
     }    
 };
 
